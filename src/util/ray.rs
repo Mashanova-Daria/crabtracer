@@ -1,5 +1,7 @@
 use crate::util::*;
+use crate::material::{ObjectMaterial};
 use glam::f64::DVec3;
+use std::rc::Rc;
 
 pub struct Ray {
     pub o: DVec3,    // origin of ray
@@ -30,12 +32,14 @@ impl Ray {
 
 // strores infromation about ray-surface intersection
 pub struct HitInfo {
-    pub t: f64,         // ray parameter for hit
-    pub p: DVec3     // hit position
+    pub t: f64,                 // ray parameter for hit
+    pub p: DVec3,               // hit position
+    pub sn: DVec3,              // shading normal
+    pub mat: Rc<ObjectMaterial>     // material at hit point
 }
 
 impl HitInfo {
     pub fn new() -> HitInfo {
-        HitInfo { t: 0.0, p: DVec3::ZERO }
+        HitInfo { t: 0.0, p: DVec3::ZERO, sn: DVec3::ZERO, mat: Rc::new(ObjectMaterial::EMPTY) }
     }
 }

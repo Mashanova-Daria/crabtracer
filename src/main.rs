@@ -6,6 +6,7 @@ use crate::scene::Scene;
 mod scene;
 mod util;
 mod surfaces;
+mod material;
 
 fn main() {
     let scene_file = File::open("./scenes/plane.json").expect("Error opening scene file");

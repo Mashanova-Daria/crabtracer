@@ -20,6 +20,11 @@ impl Transform {
         self.m.transform_point3(p)
     }
 
+    // transform normal
+    pub fn normal(&self, n: DVec3) -> DVec3 {
+        self.m_inv.transpose().transform_vector3(n).normalize()
+    }
+
     // transform ray
     pub fn ray(&self, r: &Ray) -> Ray {
         Ray::new(self.point(r.o), self.vector(r.d), Some(r.mint), Some(r.maxt))

@@ -2,11 +2,13 @@ mod camera;
 
 use camera::*;
 use serde_json::{Value};
+use crate::material::Material;
 use crate::surfaces::{SurfaceGroup, SurfaceBase};
 use crate::util::*;
 use image::{RgbImage};
 use rand::prelude::*;
 use crate::util::ray::{Ray, HitInfo};
+use glam::DVec3;
 
 pub struct Scene {
     m_camera: Camera,
@@ -26,18 +28,36 @@ impl Scene {
         }
     }
 
-    fn ray_trace_color(&self, ray: &mut Ray) -> image::Rgb<u8> {
+    fn ray_trace_color(&self, ray: &mut Ray, depth: i32) -> image::Rgb<u8> {
         let mut hit = HitInfo::new();
 
         if self.m_surface_group.intersect(ray, &mut hit) {
             // get emitted color
-            // get scattered ray
-            // call recursivley
-            //println!("found intersection");
-            return image::Rgb([255, 255, 255]);
+            let emitted = hit.mat.as_ref().emitted(ray, &hit);
+
+            if depth < crate::util::MAX_RAYTRACE_DEPTH {
+                // get scattered ray
+                let mut scattered = Ray::new(
+                    DVec3::ZERO, 
+                    DVec3::ZERO, 
+                    None, None);
+
+                // get attenuation
+                let attenuation = hit.mat.as_ref().scatter(ray, &hit, &mut scattered);
+
+                // call recursivley
+                match attenuation {
+                    Some(v) => return
+                    add_color(
+                        emitted,
+                        compose_color(v,  self.ray_trace_color(&mut scattered, depth + 1))
+                    ),
+                    None => return emitted
+                }
+            }
+            return self.m_background;
         } else {
-            // return self.m_background;
-            return image::Rgb([0, 0, 0]);
+            return self.m_background;
         }
     }
 
@@ -65,7 +85,7 @@ impl Scene {
                         (j as f64) + sample[1]
                     );
 
-                    let sample_color = self.ray_trace_color(&mut ray);
+                    let sample_color = self.ray_trace_color(&mut ray, 0);
 
                     acc_color[0] += sample_color[0] as i64;
                     acc_color[1] += sample_color[1] as i64;

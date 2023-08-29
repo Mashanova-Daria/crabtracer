@@ -11,7 +11,7 @@
             "material":
             {
                 "type": "lambertian",
-                "albedo": [0.6,0.4,0.4]
+                "albedo": [153,102,102]
             }
         },
         {
@@ -25,8 +25,8 @@
             }
         }
     ],
-    "image_samples": 1,
-    "background": [1, 1, 1],
+    "image_samples": 5,
+    "background": [255, 255, 255],
 	"accelerator":
 	{
 		"type": "bbh"

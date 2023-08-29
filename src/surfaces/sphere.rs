@@ -2,10 +2,13 @@ use crate::util::*;
 use serde_json::{Value};
 use crate::util::transform::Transform;
 use crate::surfaces::SurfaceBase;
+use crate::material::{ObjectMaterial, Material};
+use std::rc::Rc;
 
 pub struct Sphere {
     m_radius: f64,
-    m_xform: Transform  // local to world
+    m_xform: Transform,  // local to world,
+    m_material: Rc<ObjectMaterial>
 }
 
 impl SurfaceBase for Sphere {
@@ -41,6 +44,8 @@ impl SurfaceBase for Sphere {
 
         hit.t = t;
         hit.p = self.m_xform.point(p);
+        hit.sn = self.m_xform.normal(p);
+        hit.mat = Rc::clone(&self.m_material);
 
         return true;
 
@@ -61,6 +66,11 @@ impl Sphere {
             None => Transform::identity()
         };
 
-        Sphere { m_radius: radius, m_xform: transform }
+        let material = match j.get("material") {
+            Some(v) => ObjectMaterial::from_json(v),
+            None => panic!("can't parse without material")
+        };
+
+        Sphere { m_radius: radius, m_xform: transform, m_material: Rc::new(material) }
     }
 }
