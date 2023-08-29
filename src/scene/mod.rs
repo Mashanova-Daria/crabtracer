@@ -55,7 +55,7 @@ impl Scene {
                     None => return emitted
                 }
             }
-            return self.m_background;
+            return emitted;
         } else {
             return self.m_background;
         }

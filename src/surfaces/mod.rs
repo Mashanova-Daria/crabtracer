@@ -31,7 +31,7 @@ impl SurfaceBase for SurfaceGroup {
         for surface in self.m_surfaces.iter() {
             if surface.intersect(ray, hit) {
                 hit_something = true;
-                ray.mint = hit.t;
+                ray.maxt = hit.t;
             }
         }
 

@@ -26,13 +26,15 @@ impl SurfaceBase for Sphere {
         };
 
         let root_discrim = discrim.sqrt();
-        let q = if b < 0.0 { -0.5 * (b - root_discrim) } else { -0.5 * (b + root_discrim) };
 
-        let t1 = q / a;
-        let t2 = c / q;
+        let t1 = ( -0.5 * (b - root_discrim) ) / a;
+        let t2 = ( -0.5 * (b + root_discrim) ) / a;
 
         // compute distance along ray
-        let t = if t1 < t_ray.mint { t2 } else { t1 };
+        let t_min = t1.min(t2);
+        let t_max = t1.max(t2);
+
+        let t = if t_min < t_ray.mint { t_max } else { t_min };
 
         // check if t is within ray limits
         if t < t_ray.mint || t > t_ray.maxt {
@@ -40,7 +42,8 @@ impl SurfaceBase for Sphere {
         };
 
         // get point and fill in hit info
-        let p = t_ray.get_point(t) * (self.m_radius / t_ray.get_point(t).length());
+        // let p = t_ray.get_point(t) * (self.m_radius / t_ray.get_point(t).length());
+        let p = t_ray.get_point(t);
 
         hit.t = t;
         hit.p = self.m_xform.point(p);

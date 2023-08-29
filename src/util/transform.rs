@@ -1,4 +1,4 @@
-use glam::f64::{DMat4, DVec3};
+use glam::f64::{DMat4, DVec3, DQuat};
 use serde_json::{Value};
 use crate::util::*;
 use crate::util::ray::Ray;
@@ -54,7 +54,26 @@ impl Transform {
             None => DVec3::ZERO
         };
 
-        let transform_mat = DMat4::from_translation(translation_vec);
+        let axis_vec = match j.get("axis") {
+            Some(v) => {
+                let val_arr = v.as_array().unwrap();
+                DVec3 {
+                    x: safe_value_to_f64(&val_arr[0], 0.0),
+                    y: safe_value_to_f64(&val_arr[1], 0.0),
+                    z: safe_value_to_f64(&val_arr[2], 0.0)
+                }
+            },
+            None => DVec3::ZERO
+        };
+
+        let angle = match j.get("angle") {
+            Some(v) => M_PI * safe_value_to_f64(v, 0.0),
+            None => 0.0
+        };
+
+        let transform_mat = DMat4::from_rotation_translation(
+            DQuat::from_axis_angle(axis_vec, angle), 
+            translation_vec);
 
         Transform {
             m: transform_mat,
